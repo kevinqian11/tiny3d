@@ -12,20 +12,20 @@ module tt_um_tiny3d_kevinqian11(
 
   // TinyTapeout I/O Mappings
   logic reset;
-  logic left, right,
-  logic hsync, vsync,
-  logic [1:0] r, g, b
+  logic left, right;
+  logic hsync, vsync;
+  logic [1:0] r, g, b;
   assign reset = rst_n;
   assign left = ui_in[0];
   assign right = ui_in[1];
-  assign ui_out[0] = hsync;
-  assign ui_out[1] = vsync;
-  assign ui_out[2] = r[1];
-  assign ui_out[3] = r[0];
-  assign ui_out[4] = g[1];
-  assign ui_out[5] = g[0];
-  assign ui_out[6] = b[1];
-  assign ui_out[7] = b[0];
+  assign uo_out[0] = hsync;
+  assign uo_out[1] = vsync;
+  assign uo_out[2] = r[1];
+  assign uo_out[3] = r[0];
+  assign uo_out[4] = g[1];
+  assign uo_out[5] = g[0];
+  assign uo_out[6] = b[1];
+  assign uo_out[7] = b[0];
   assign uio_oe  = 0;
   wire _unused = &{ena, 1'b0};
 
