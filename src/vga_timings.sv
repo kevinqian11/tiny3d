@@ -1,7 +1,7 @@
 `default_nettype none
 // VGA Display Timings 640x480
 module vga_timings
-  (input logic clk, reset,
+  (input logic clk, rst_n,
   output logic hsync, vsync,
   output logic [9:0] row, col,
   output logic display,
@@ -17,7 +17,7 @@ module vga_timings
   
   // count xy screen position
   always_ff @(posedge clk) begin
-    if(reset) begin
+    if(~rst_n) begin
       col <= 0;
       row <= 0;
     end

@@ -4,8 +4,8 @@ module rotation
     (input logic signed [2:0][7:0] A,
     input logic signed [7:0] cos, sin,
     input logic [1:0] axis,
-    input logic clk, en, reset,
-    output logic signed [1:0][7:0] X);
+    input logic clk, en, rst_n,
+    output logic signed [2:0][7:0] X);
 
     // Axis Rotation Multiply Values
     logic signed [7:0] U, V;
@@ -61,7 +61,7 @@ module rotation
     end
 
     always_ff @(posedge clk) begin
-        if(reset) begin
+        if(~rst_n) begin
             X <= '0;
         end
         else if(en) begin

@@ -43,17 +43,21 @@ module tt_um_tiny3d_kevinqian11(
     b = (display) ? bbuf : 2'b00;
   end
 
-  // X-axis angle control
-  logic [7:0] angle;
-  X_angle X_rotate(.*);
+  // Y-axis angle control
+  logic [7:0] angleY;
+  Y_angle Y_control(.*);
 
-  // trig look-up table
-  logic signed [7:0] sin, cos;
-  trig_lut lookup(.*);
+  // X-axis angle control
+  logic [7:0] angleX;
+  X_angle X_control(.*);
+
+  // Z-axis angle control
+  logic [7:0] angleZ;
+  logic shape;
+  Z_angle Z_control(.*);
 
   // sequential vertex processing
   logic [7:0][10:0] sx, sy;
-  logic [1:0] axis = 2'b01; // temporary static spin for emulation
   vertex map(.*);
 
   // display match vertex
