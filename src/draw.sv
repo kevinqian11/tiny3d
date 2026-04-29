@@ -26,8 +26,8 @@ module tt_um_tiny3d_kevinqian11(
   assign uo_out[5] = g[0];
   assign uo_out[6] = b[1];
   assign uo_out[7] = b[0];
+  assign uio_out = 0;
   assign uio_oe  = 0;
-  wire _unused = &{ena, ui_in[7:2], uio_in, uio_out, 1'b0};
 
   // VGA display timings
   logic [9:0] row, col;
@@ -69,5 +69,8 @@ module tt_um_tiny3d_kevinqian11(
   // Later Implement Further Z direction = Lower Shade if there's room
   // Color each vertex a distinct color for emulation
   two_face color_vertex(.*);
+
+  // unused wires
+  wire _unused = &{ena, ui_in[7:2], uio_in, row[0], col[0], 1'b0};
 
 endmodule: tt_um_tiny3d_kevinqian11

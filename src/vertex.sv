@@ -14,12 +14,13 @@ module vertex
 
     // FSM states
     typedef enum logic [2:0] {IDLE, ROTATE, WAIT, SAVE, DONE} state_t;
-    state_t state = IDLE;
+    state_t state;
+    initial state = IDLE;
 
     // vertex rotation module
     logic [2:0] v_idx;
     logic [2:0][7:0] A;
-    logic [2:0][7:0] X;
+    logic [1:0][7:0] X;
     logic en = 1'b1;
     rotation rot_unit(.*);
 

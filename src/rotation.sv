@@ -5,7 +5,7 @@ module rotation
     input logic signed [7:0] cos, sin,
     input logic [1:0] axis,
     input logic clk, en, reset,
-    output logic signed [2:0][7:0] X);
+    output logic signed [1:0][7:0] X);
 
     // Axis Rotation Multiply Values
     logic signed [7:0] U, V;
