@@ -27,7 +27,7 @@ module tt_um_tiny3d_kevinqian11(
   assign uo_out[6] = b[1];
   assign uo_out[7] = b[0];
   assign uio_oe  = 0;
-  wire _unused = &{ena, 1'b0};
+  wire _unused = &{ena, ui_in[7:2], 1'b0};
 
   // VGA display timings
   logic [9:0] row, col;
