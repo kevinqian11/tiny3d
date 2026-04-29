@@ -12,12 +12,16 @@ module tt_um_tiny3d_kevinqian11(
 
   // TinyTapeout I/O Mappings
   logic reset;
-  logic left, right;
+  logic left, right, up, down, leftz, rightz;
   logic hsync, vsync;
   logic [1:0] r, g, b;
   assign reset = rst_n;
   assign left = ui_in[0];
   assign right = ui_in[1];
+  assign up = ui_in[2];
+  assign down = ui_in[3];
+  assign leftz = ui_in[4];
+  assign rightz = ui_in[5];
   assign uo_out[0] = hsync;
   assign uo_out[1] = vsync;
   assign uo_out[2] = r[1];
@@ -75,6 +79,6 @@ module tt_um_tiny3d_kevinqian11(
   two_face color_vertex(.*);
 
   // unused wires
-  wire _unused = &{ena, ui_in[7:2], uio_in, row[0], col[0], 1'b0};
+  wire _unused = &{ena, ui_in[7:6], uio_in, row[0], col[0], 1'b0};
 
 endmodule: tt_um_tiny3d_kevinqian11
