@@ -1,0 +1,73 @@
+`default_nettype none
+module tt_um_tiny3d_kevinqian11(
+  input  wire [7:0] ui_in,    // Dedicated inputs
+  output wire [7:0] uo_out,   // Dedicated outputs
+  input  wire [7:0] uio_in,   // IOs: Input path
+  output wire [7:0] uio_out,  // IOs: Output path
+  output wire [7:0] uio_oe,   // IOs: Enable path (active high: 0=input, 1=output)
+  input  wire       ena,      // always 1 when the design is powered, so you can ignore it
+  input  wire       clk,      // clock
+  input  wire       rst_n     // reset_n - low to reset
+);
+
+  // TinyTapeout I/O Mappings
+  logic reset;
+  logic left, right,
+  logic hsync, vsync,
+  logic [1:0] r, g, b
+  assign reset = rst_n;
+  assign left = ui_in[0];
+  assign right = ui_in[1];
+  assign ui_out[0] = hsync;
+  assign ui_out[1] = vsync;
+  assign ui_out[2] = r[1];
+  assign ui_out[3] = r[0];
+  assign ui_out[4] = g[1];
+  assign ui_out[5] = g[0];
+  assign ui_out[6] = b[1];
+  assign ui_out[7] = b[0];
+  assign uio_oe  = 0;
+  wire _unused = &{ena, 1'b0};
+
+  // VGA display timings
+  logic [9:0] row, col;
+  logic display;
+  logic vblank;
+  vga_timings timing(.*);
+
+  // display blanking intervals
+  logic [1:0] rbuf, gbuf, bbuf;
+  always_comb begin
+    r = (display) ? rbuf : 2'b00;
+    g = (display) ? gbuf : 2'b00;
+    b = (display) ? bbuf : 2'b00;
+  end
+
+  // X-axis angle control
+  logic [7:0] angle;
+  X_angle X_rotate(.*);
+
+  // trig look-up table
+  logic signed [7:0] sin, cos;
+  trig_lut lookup(.*);
+
+  // sequential vertex processing
+  logic [7:0][10:0] sx, sy;
+  logic [1:0] axis = 2'b01; // temporary static spin for emulation
+  vertex map(.*);
+
+  // display match vertex
+  logic [7:0] vertex_match; 
+  always_comb begin
+    vertex_match = 8'b0;
+    for(int i = 0; i < 8; i++) begin
+      vertex_match[i] = (col[9:1] == sx[i][9:1]) && (row[9:1] == sy[i][9:1]);
+    end
+  end
+
+  // display color vertex
+  // Later Implement Further Z direction = Lower Shade if there's room
+  // Color each vertex a distinct color for emulation
+  two_face color_vertex(.*);
+
+endmodule: tt_um_tiny3d_kevinqian11
