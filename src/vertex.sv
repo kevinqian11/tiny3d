@@ -20,7 +20,7 @@ module vertex
     logic signed [7:0] temp_x, temp_y, temp_z;
 
     // Trig look-up table
-    logic signed [7:0] sin, cos;
+    logic signed [5:0] sin, cos;
     logic [7:0] angle;
     trig_lut lookup(.*);
 

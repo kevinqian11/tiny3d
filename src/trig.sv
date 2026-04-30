@@ -2,57 +2,66 @@
 
 module trig_lut
     (input logic [7:0] angle,
-    output logic signed [7:0] sin,
-    output logic signed [7:0] cos);
+    output logic signed [5:0] sin, // OPTIMIZED: 6-bit
+    output logic signed [5:0] cos); // OPTIMIZED: 6-bit
 
     logic [7:0] angle_sin, angle_cos;
     logic [5:0] addr_sin, addr_cos;
     logic [1:0] quad_sin, quad_cos;
-    
-    // 7-bit internal logic. Max value is 64.
-    logic [6:0] val_sin, val_cos;
+    logic [4:0] val_sin, val_cos; // 5-bit absolute value (max 16)
 
-    // cos is just sin shifted by 90 degrees (64 units in 8-bit)
     assign angle_sin = angle;
     assign angle_cos = angle + 8'd64;
 
-    // find quadrant
     assign quad_sin = angle_sin[7:6];
     assign quad_cos = angle_cos[7:6];
 
-    // Bitwise XOR to mirror the wave (smaller than MUX)
-    assign addr_sin = angle_sin[5:0] ^ {6{quad_sin[0]}};
-    assign addr_cos = angle_cos[5:0] ^ {6{quad_cos[0]}};
-
-    // Yosys-safe lookup table using a function
-    function automatic logic [6:0] get_wave(input logic [5:0] a);
-        case(a)
-            6'd0:  get_wave = 7'd0;   6'd1:  get_wave = 7'd2;   6'd2:  get_wave = 7'd3;   6'd3:  get_wave = 7'd5;
-            6'd4:  get_wave = 7'd6;   6'd5:  get_wave = 7'd8;   6'd6:  get_wave = 7'd9;   6'd7:  get_wave = 7'd11;
-            6'd8:  get_wave = 7'd12;  6'd9:  get_wave = 7'd14;  6'd10: get_wave = 7'd16;  6'd11: get_wave = 7'd17;
-            6'd12: get_wave = 7'd19;  6'd13: get_wave = 7'd20;  6'd14: get_wave = 7'd22;  6'd15: get_wave = 7'd23;
-            6'd16: get_wave = 7'd24;  6'd17: get_wave = 7'd26;  6'd18: get_wave = 7'd27;  6'd19: get_wave = 7'd29;
-            6'd20: get_wave = 7'd30;  6'd21: get_wave = 7'd32;  6'd22: get_wave = 7'd33;  6'd23: get_wave = 7'd34;
-            6'd24: get_wave = 7'd36;  6'd25: get_wave = 7'd37;  6'd26: get_wave = 7'd38;  6'd27: get_wave = 7'd39;
-            6'd28: get_wave = 7'd41;  6'd29: get_wave = 7'd42;  6'd30: get_wave = 7'd43;  6'd31: get_wave = 7'd44;
-            6'd32: get_wave = 7'd45;  6'd33: get_wave = 7'd46;  6'd34: get_wave = 7'd47;  6'd35: get_wave = 7'd48;
-            6'd36: get_wave = 7'd49;  6'd37: get_wave = 7'd50;  6'd38: get_wave = 7'd51;  6'd39: get_wave = 7'd52;
-            6'd40: get_wave = 7'd53;  6'd41: get_wave = 7'd54;  6'd42: get_wave = 7'd55;  6'd43: get_wave = 7'd55;
-            6'd44: get_wave = 7'd56;  6'd45: get_wave = 7'd57;  6'd46: get_wave = 7'd58;  6'd47: get_wave = 7'd58;
-            6'd48: get_wave = 7'd59;  6'd49: get_wave = 7'd60;  6'd50: get_wave = 7'd60;  6'd51: get_wave = 7'd61;
-            6'd52: get_wave = 7'd61;  6'd53: get_wave = 7'd62;  6'd54: get_wave = 7'd62;  6'd55: get_wave = 7'd63;
-            6'd56: get_wave = 7'd63;  6'd57: get_wave = 7'd63;  6'd58: get_wave = 7'd64;  6'd59: get_wave = 7'd64;
-            6'd60: get_wave = 7'd64;  6'd61: get_wave = 7'd64;  6'd62: get_wave = 7'd64;  6'd63: get_wave = 7'd64;
-            default: get_wave = 7'd0;
-        endcase
-    endfunction
+    assign addr_sin = (quad_sin[0]) ? ~angle_sin[5:0] : angle_sin[5:0];
+    assign addr_cos = (quad_cos[0]) ? ~angle_cos[5:0] : angle_cos[5:0];
 
     always_comb begin
-        val_sin = get_wave(addr_sin);
-        val_cos = get_wave(addr_cos);
+        // Scaled to max 16 (which is 1.0 in our new fractional math)
+        case(addr_sin)
+            6'd0:  val_sin = 5'd0;   6'd1:  val_sin = 5'd0;   6'd2:  val_sin = 5'd1;   6'd3:  val_sin = 5'd1;
+            6'd4:  val_sin = 5'd2;   6'd5:  val_sin = 5'd2;   6'd6:  val_sin = 5'd2;   6'd7:  val_sin = 5'd3;
+            6'd8:  val_sin = 5'd3;   6'd9:  val_sin = 5'd4;   6'd10: val_sin = 5'd4;   6'd11: val_sin = 5'd4;
+            6'd12: val_sin = 5'd5;   6'd13: val_sin = 5'd5;   6'd14: val_sin = 5'd6;   6'd15: val_sin = 5'd6;
+            6'd16: val_sin = 5'd6;   6'd17: val_sin = 5'd7;   6'd18: val_sin = 5'd7;   6'd19: val_sin = 5'd7;
+            6'd20: val_sin = 5'd8;   6'd21: val_sin = 5'd8;   6'd22: val_sin = 5'd8;   6'd23: val_sin = 5'd9;
+            6'd24: val_sin = 5'd9;   6'd25: val_sin = 5'd9;   6'd26: val_sin = 5'd10;  6'd27: val_sin = 5'd10;
+            6'd28: val_sin = 5'd10;  6'd29: val_sin = 5'd11;  6'd30: val_sin = 5'd11;  6'd31: val_sin = 5'd11;
+            6'd32: val_sin = 5'd11;  6'd33: val_sin = 5'd12;  6'd34: val_sin = 5'd12;  6'd35: val_sin = 5'd12;
+            6'd36: val_sin = 5'd12;  6'd37: val_sin = 5'd13;  6'd38: val_sin = 5'd13;  6'd39: val_sin = 5'd13;
+            6'd40: val_sin = 5'd13;  6'd41: val_sin = 5'd14;  6'd42: val_sin = 5'd14;  6'd43: val_sin = 5'd14;
+            6'd44: val_sin = 5'd14;  6'd45: val_sin = 5'd14;  6'd46: val_sin = 5'd15;  6'd47: val_sin = 5'd15;
+            6'd48: val_sin = 5'd15;  6'd49: val_sin = 5'd15;  6'd50: val_sin = 5'd15;  6'd51: val_sin = 5'd15;
+            6'd52: val_sin = 5'd15;  6'd53: val_sin = 5'd16;  6'd54: val_sin = 5'd16;  6'd55: val_sin = 5'd16;
+            6'd56: val_sin = 5'd16;  6'd57: val_sin = 5'd16;  6'd58: val_sin = 5'd16;  6'd59: val_sin = 5'd16;
+            6'd60: val_sin = 5'd16;  6'd61: val_sin = 5'd16;  6'd62: val_sin = 5'd16;  6'd63: val_sin = 5'd16;
+            default: val_sin = 5'd0;
+        endcase
+
+        case(addr_cos)
+            6'd0:  val_cos = 5'd0;   6'd1:  val_cos = 5'd0;   6'd2:  val_cos = 5'd1;   6'd3:  val_cos = 5'd1;
+            6'd4:  val_cos = 5'd2;   6'd5:  val_cos = 5'd2;   6'd6:  val_cos = 5'd2;   6'd7:  val_cos = 5'd3;
+            6'd8:  val_cos = 5'd3;   6'd9:  val_cos = 5'd4;   6'd10: val_cos = 5'd4;   6'd11: val_cos = 5'd4;
+            6'd12: val_cos = 5'd5;   6'd13: val_cos = 5'd5;   6'd14: val_cos = 5'd6;   6'd15: val_cos = 5'd6;
+            6'd16: val_cos = 5'd6;   6'd17: val_cos = 5'd7;   6'd18: val_cos = 5'd7;   6'd19: val_cos = 5'd7;
+            6'd20: val_cos = 5'd8;   6'd21: val_cos = 5'd8;   6'd22: val_cos = 5'd8;   6'd23: val_cos = 5'd9;
+            6'd24: val_cos = 5'd9;   6'd25: val_cos = 5'd9;   6'd26: val_cos = 5'd10;  6'd27: val_cos = 5'd10;
+            6'd28: val_cos = 5'd10;  6'd29: val_cos = 5'd11;  6'd30: val_cos = 5'd11;  6'd31: val_cos = 5'd11;
+            6'd32: val_cos = 5'd11;  6'd33: val_cos = 5'd12;  6'd34: val_cos = 5'd12;  6'd35: val_cos = 5'd12;
+            6'd36: val_cos = 5'd12;  6'd37: val_cos = 5'd13;  6'd38: val_cos = 5'd13;  6'd39: val_cos = 5'd13;
+            6'd40: val_cos = 5'd13;  6'd41: val_cos = 5'd14;  6'd42: val_cos = 5'd14;  6'd43: val_cos = 5'd14;
+            6'd44: val_cos = 5'd14;  6'd45: val_cos = 5'd14;  6'd46: val_cos = 5'd15;  6'd47: val_cos = 5'd15;
+            6'd48: val_cos = 5'd15;  6'd49: val_cos = 5'd15;  6'd50: val_cos = 5'd15;  6'd51: val_cos = 5'd15;
+            6'd52: val_cos = 5'd15;  6'd53: val_cos = 5'd16;  6'd54: val_cos = 5'd16;  6'd55: val_cos = 5'd16;
+            6'd56: val_cos = 5'd16;  6'd57: val_cos = 5'd16;  6'd58: val_cos = 5'd16;  6'd59: val_cos = 5'd16;
+            6'd60: val_cos = 5'd16;  6'd61: val_cos = 5'd16;  6'd62: val_cos = 5'd16;  6'd63: val_cos = 5'd16;
+            default: val_cos = 5'd0;
+        endcase
     end
 
-    // Pad back out to 8 bits (add the leading 0) and apply the quadrant sign
     assign sin = (quad_sin[1]) ? -$signed({1'b0, val_sin}) : $signed({1'b0, val_sin});
     assign cos = (quad_cos[1]) ? -$signed({1'b0, val_cos}) : $signed({1'b0, val_cos});
 

@@ -1,7 +1,7 @@
 module rotation_2d
     (input logic clk, en, rst_n,
     input logic signed [7:0] u_in, v_in,
-    input logic signed [7:0] cos, sin,
+    input logic signed [5:0] cos, sin,
     output logic signed [7:0] u_out, v_out);
 
     // 1. The Math (4 multipliers, unchanged)
@@ -16,8 +16,8 @@ module rotation_2d
             v_out <= '0;
         end
         else if(en) begin
-            u_out <= 8'((sum0 + 17'sd32) >>> 6);
-            v_out <= 8'((sum1 + 17'sd32) >>> 6);
+            u_out <= 8'((sum0 + 15'sd8) >>> 4); // Shift by 4 to divide by 16
+            v_out <= 8'((sum1 + 15'sd8) >>> 4);
         end
     end
 endmodule
