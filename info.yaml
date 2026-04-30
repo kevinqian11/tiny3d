@@ -31,10 +31,10 @@ pinout:
   # Inputs
   ui[0]: "left"
   ui[1]: "right"
-  ui[2]: ""
-  ui[3]: ""
-  ui[4]: ""
-  ui[5]: ""
+  ui[2]: "up"
+  ui[3]: "down"
+  ui[4]: "leftz"
+  ui[5]: "rightz"
   ui[6]: ""
   ui[7]: ""
 
