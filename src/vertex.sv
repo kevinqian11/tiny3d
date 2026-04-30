@@ -6,9 +6,9 @@ module vertex
     input logic [7:0] angleX, angleY, angleZ,
     output logic [7:0][10:0] sx, sy);
 
-    const logic signed [7:0][7:0] home_x;
-    const logic signed [7:0][7:0] home_y;
-    const logic signed [7:0][7:0] home_z;
+    logic signed [7:0][7:0] home_x;
+    logic signed [7:0][7:0] home_y;
+    logic signed [7:0][7:0] home_z;
 
     // cube starting vertex coordinates
     const logic signed [7:0][7:0] cube_x = {-8'sd64,  8'sd64, -8'sd64,  8'sd64, -8'sd64,  8'sd64, -8'sd64,  8'sd64};
