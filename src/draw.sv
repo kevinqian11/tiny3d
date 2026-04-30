@@ -53,7 +53,7 @@ module tt_um_tiny3d_kevinqian11(
   controls XYZShape(.*);
 
   // sequential vertex processing
-  logic [7:0][10:0] sx, sy;
+  logic [7:0][9:0] sx, sy;
   vertex map(.*);
 
   // display match vertex

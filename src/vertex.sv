@@ -4,104 +4,121 @@ module vertex
     (input logic clk, rst_n,
     input logic vblank,
     input logic [7:0] angleX, angleY, angleZ,
-    output logic [7:0][10:0] sx, sy);
+    output logic [7:0][9:0] sx, sy); // OPTIMIZATION: Reduced from 11 bits to 10 bits
 
-    // cube starting vertex coordinates
+    // Starting vertex coordinates
     const logic signed [7:0][7:0] home_x = {-8'sd64,  8'sd64, -8'sd64,  8'sd64, -8'sd64,  8'sd64, -8'sd64,  8'sd64};
     const logic signed [7:0][7:0] home_y = {-8'sd64, -8'sd64,  8'sd64,  8'sd64, -8'sd64, -8'sd64,  8'sd64,  8'sd64};
     const logic signed [7:0][7:0] home_z = {-8'sd64, -8'sd64, -8'sd64, -8'sd64,  8'sd64,  8'sd64,  8'sd64,  8'sd64};
 
-    // FSM states
-    typedef enum logic [3:0] {IDLE, ROTATEY, WAITY, ROTATEX, WAITX, ROTATEZ, WAITZ, SAVE, DONE} state_t;
+    // FSM states (Added FETCH to cleanly load coordinates)
+    typedef enum logic [3:0] {IDLE, FETCH, ROTATEY, WAITY, ROTATEX, WAITX, ROTATEZ, WAITZ, SAVE, DONE} state_t;
     state_t state;
-    initial state = IDLE;
+    
+    // FSM Scratchpad Registers
+    logic [2:0] v_idx;
+    logic signed [7:0] temp_x, temp_y, temp_z;
 
-    // trig look-up table
+    // Trig look-up table
     logic signed [7:0] sin, cos;
     logic [7:0] angle;
     trig_lut lookup(.*);
 
-    // vertex rotation module
-    logic [2:0] v_idx;
-    logic signed [2:0][7:0] A;
-    logic signed [2:0][7:0] X;
-    logic [1:0] axis;
+    // Lean 2D Rotation module interface
+    logic signed [7:0] u_in, v_in;
+    logic signed [7:0] u_out, v_out;
     logic en = 1'b1;
-    rotation rot_unit(.*);
+    
+    rotation_2d rot_unit(
+        .clk(clk), .en(en), .rst_n(rst_n),
+        .u_in(u_in), .v_in(v_in),
+        .cos(cos), .sin(sin),
+        .u_out(u_out), .v_out(v_out)
+    );
 
-    // FSM transition logic
+    // FSM Transition Logic
     always_ff @(posedge clk) begin
-        // reset state
         if (~rst_n) begin
             state <= IDLE;
             v_idx <= 0;
+            u_in <= 0; v_in <= 0; angle <= 0;
+            temp_x <= 0; temp_y <= 0; temp_z <= 0;
             for (int i = 0; i < 8; i = i + 1) begin
-                sx[i] <= 11'd0;
-                sy[i] <= 11'd0;
+                sx[i] <= 10'd0;
+                sy[i] <= 10'd0;
             end
         end 
         else begin
             case (state)
-                // wait for vertical blanking
+                // Wait for vertical blanking
                 IDLE: begin
                     if(vblank) begin
                         v_idx <= 0;
-                        state <= ROTATEY;
+                        state <= FETCH;
                     end
                 end
                 
-                // start Y rotation
+                // Load original coordinates into our scratchpad
+                FETCH: begin
+                    temp_x <= home_x[v_idx];
+                    temp_y <= home_y[v_idx];
+                    temp_z <= home_z[v_idx];
+                    state <= ROTATEY;
+                end
+                
+                // 1. START Y ROTATION (U=X, V=Z)
                 ROTATEY: begin
-                    axis <= 2'b01;
+                    u_in <= temp_x; 
+                    v_in <= temp_z;
                     angle <= angleY;
-                    A[0] <= home_x[v_idx];
-                    A[1] <= home_y[v_idx];
-                    A[2] <= home_z[v_idx];
                     state <= WAITY;
                 end
                 WAITY: begin
                     state <= ROTATEX;
                 end
-                // start X rotation
+                
+                // 2. START X ROTATION (U=Z, V=Y)
+                // u_out is our New X. v_out is our New Z.
                 ROTATEX: begin
-                    axis <= 2'b00;
+                    temp_x <= u_out; // Save the New X in our scratchpad for later
+                    u_in <= v_out;   // Feed the New Z in as U
+                    v_in <= temp_y;  // Feed the original Y in as V
                     angle <= angleX;
-                    A[0] <= X[0];
-                    A[1] <= X[1];
-                    A[2] <= X[2];
                     state <= WAITX;
                 end
                 WAITX: begin
                     state <= ROTATEZ;
                 end
-                // start Z rotation
+                
+                // 3. START Z ROTATION (U=Y, V=X)
+                // u_out is our Newer Z. v_out is our New Y.
                 ROTATEZ: begin
-                    axis <= 2'b10;
+                    u_in <= v_out;   // Feed the New Y in as U
+                    v_in <= temp_x;  // Feed our saved New X in as V
                     angle <= angleZ;
-                    A[0] <= X[0];
-                    A[1] <= X[1];
-                    A[2] <= X[2];
                     state <= WAITZ;
                 end
                 WAITZ: begin
                     state <= SAVE;
                 end
 
-                // map each vertex rotation to screen
+                // 4. MAP TO SCREEN
+                // u_out is our Final Y. v_out is our Final X.
                 SAVE: begin
-                    sx[v_idx] <= {{3{X[0][7]}}, X[0]} + 11'd320;
-                    sy[v_idx] <= {{3{X[1][7]}}, X[1]} + 11'd240;
+                    // Sign extend 8-bit to 10-bit and add screen offsets
+                    sx[v_idx] <= {{2{v_out[7]}}, v_out} + 10'd320;
+                    sy[v_idx] <= {{2{u_out[7]}}, u_out} + 10'd240;
                     
                     if(v_idx == 3'd7) begin
                         state <= DONE;
                     end
                     else begin
                         v_idx <= v_idx + 3'd1;
-                        state <= ROTATEY;
+                        state <= FETCH;
                     end
                 end
 
-                // wait for end of vertical blanking
+                // Wait for end of vertical blanking
                 DONE: begin
                     if(!vblank) begin
                         state <= IDLE;
