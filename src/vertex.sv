@@ -2,7 +2,7 @@
 
 module vertex 
     (input logic clk, rst_n,
-    input logic vblank, shape,
+    input logic vblank,
     input logic [7:0] angleX, angleY, angleZ,
     output logic [7:0][10:0] sx, sy);
 
