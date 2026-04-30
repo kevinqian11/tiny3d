@@ -6,34 +6,10 @@ module vertex
     input logic [7:0] angleX, angleY, angleZ,
     output logic [7:0][10:0] sx, sy);
 
-    logic signed [7:0][7:0] home_x;
-    logic signed [7:0][7:0] home_y;
-    logic signed [7:0][7:0] home_z;
-
     // cube starting vertex coordinates
-    const logic signed [7:0][7:0] cube_x = {-8'sd64,  8'sd64, -8'sd64,  8'sd64, -8'sd64,  8'sd64, -8'sd64,  8'sd64};
-    const logic signed [7:0][7:0] cube_y = {-8'sd64, -8'sd64,  8'sd64,  8'sd64, -8'sd64, -8'sd64,  8'sd64,  8'sd64};
-    const logic signed [7:0][7:0] cube_z = {-8'sd64, -8'sd64, -8'sd64, -8'sd64,  8'sd64,  8'sd64,  8'sd64,  8'sd64};
-
-    // tetrahedron starting vertex coordinates
-    const logic signed [7:0][7:0] tri_x = {
-         8'sd39, -8'sd39,  8'sd0,   8'sd0,   // V7, V6, V5, V4 (Inner)
-         8'sd78, -8'sd78,  8'sd0,   8'sd0    // V3, V2, V1, V0 (Outer)
-    };
-    
-    const logic signed [7:0][7:0] tri_y = {
-         8'sd16,   8'sd16,  8'sd16, -8'sd48, // V7, V6, V5, V4 (Inner)
-         8'sd32,   8'sd32,  8'sd32, -8'sd96  // V3, V2, V1, V0 (Outer)
-    };
-    
-    const logic signed [7:0][7:0] tri_z = {
-         8'sd22,   8'sd22, -8'sd45,  8'sd0,   // V7, V6, V5, V4 (Inner)
-         8'sd45,   8'sd45, -8'sd90,  8'sd0    // V3, V2, V1, V0 (Outer)
-    };
-
-    assign home_x = (shape) ? (tri_x) : (cube_x);
-    assign home_y = (shape) ? (tri_y) : (cube_y);
-    assign home_z = (shape) ? (tri_z) : (cube_z);
+    const logic signed [7:0][7:0] home_x = {-8'sd64,  8'sd64, -8'sd64,  8'sd64, -8'sd64,  8'sd64, -8'sd64,  8'sd64};
+    const logic signed [7:0][7:0] home_y = {-8'sd64, -8'sd64,  8'sd64,  8'sd64, -8'sd64, -8'sd64,  8'sd64,  8'sd64};
+    const logic signed [7:0][7:0] home_z = {-8'sd64, -8'sd64, -8'sd64, -8'sd64,  8'sd64,  8'sd64,  8'sd64,  8'sd64};
 
     // FSM states
     typedef enum logic [3:0] {IDLE, ROTATEY, WAITY, ROTATEX, WAITX, ROTATEZ, WAITZ, SAVE, DONE} state_t;

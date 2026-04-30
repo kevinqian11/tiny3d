@@ -50,7 +50,6 @@ module tt_um_tiny3d_kevinqian11(
   logic [7:0] angleY;
   logic [7:0] angleX;
   logic [7:0] angleZ;
-  logic shape;
   controls XYZShape(.*);
 
   // sequential vertex processing
