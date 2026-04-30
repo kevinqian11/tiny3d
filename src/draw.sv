@@ -46,18 +46,12 @@ module tt_um_tiny3d_kevinqian11(
     b = (display) ? bbuf : 2'b00;
   end
 
-  // Y-axis angle control
+  // angle and shape button controls
   logic [7:0] angleY;
-  Y_angle Y_control(.*);
-
-  // X-axis angle control
   logic [7:0] angleX;
-  X_angle X_control(.*);
-
-  // Z-axis angle control
   logic [7:0] angleZ;
   logic shape;
-  Z_angle Z_control(.*);
+  controls XYZShape(.*);
 
   // sequential vertex processing
   logic [7:0][10:0] sx, sy;
