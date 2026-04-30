@@ -11,11 +11,10 @@ module tt_um_tiny3d_kevinqian11(
 );
 
   // TinyTapeout I/O Mappings
-  logic reset;
+
   logic left, right, up, down, leftz, rightz;
   logic hsync, vsync;
   logic [1:0] r, g, b;
-  assign reset = rst_n;
   assign left = ui_in[0];
   assign right = ui_in[1];
   assign up = ui_in[2];

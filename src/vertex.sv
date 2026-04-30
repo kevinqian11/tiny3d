@@ -37,7 +37,8 @@ module vertex
 
     // FSM states
     typedef enum logic [3:0] {IDLE, ROTATEY, WAITY, ROTATEX, WAITX, ROTATEZ, WAITZ, SAVE, DONE} state_t;
-    state_t state = IDLE;
+    state_t state;
+    initial state = IDLE;
 
     // trig look-up table
     logic signed [7:0] sin, cos;
