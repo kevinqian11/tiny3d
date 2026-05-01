@@ -64,7 +64,7 @@ module tt_um_tiny3d_kevinqian11(
       current_sx = sx[i];
       current_sy = sy[i];
             
-      vertex_match[i] = (col[9:1] == current_sx[9:1]) && (row[9:1] == current_sy[9:1]);
+      vertex_match[i] = (col[8:1] == current_sx[8:1]) && (row[8:1] == current_sy[8:1]);
     end
   end
 
@@ -72,6 +72,6 @@ module tt_um_tiny3d_kevinqian11(
   two_face color_vertex(.*);
 
   // Unused wires
-  wire _unused = &{ena, ui_in[7:6], uio_in, row[0], col[0], current_sx[0], current_sy[0], 1'b0};
+  wire _unused = &{ena, ui_in[7:6], uio_in, row[0], row[9], col[0], col[9], current_sx[0], current_sx[9], current_sy[0], current_sy[9], 1'b0};
 
 endmodule: tt_um_tiny3d_kevinqian11
