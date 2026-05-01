@@ -1,23 +1,27 @@
+`default_nettype none
+
+// 2D Rotation Matrix Module
 module rotation_2d
-    (input logic clk, en, rst_n,
-    input logic signed [7:0] u_in, v_in,
-    input logic signed [5:0] cos, sin,
-    output logic signed [7:0] u_out, v_out);
+  (input logic clk, en, rst_n,
+  input logic signed [7:0] u_in, v_in,
+  input logic signed [5:0] cos, sin,
+  output logic signed [7:0] u_out, v_out);
 
-    // 1. The Math (4 multipliers, unchanged)
-    logic signed [16:0] sum0, sum1;
-    assign sum0 = (u_in * cos) - (v_in * sin);
-    assign sum1 = (v_in * cos) + (u_in * sin);
+  // Rotation Matrix Arithmetic
+  logic signed [16:0] sum0, sum1;
+  assign sum0 = (u_in * cos) - (v_in * sin);
+  assign sum1 = (v_in * cos) + (u_in * sin);
 
-    // 2. The Output Register
-    always_ff @(posedge clk) begin
-        if(~rst_n) begin
-            u_out <= '0;
-            v_out <= '0;
-        end
-        else if(en) begin
-            u_out <= 8'((sum0 + 15'sd8) >>> 4); // Shift by 4 to divide by 16
-            v_out <= 8'((sum1 + 15'sd8) >>> 4);
-        end
+  // Rounded Output Registers
+  always_ff @(posedge clk) begin
+    if(~rst_n) begin
+      u_out <= '0;
+      v_out <= '0;
     end
+    else if(en) begin
+      u_out <= 8'((sum0 + 15'sd8) >>> 4);
+      v_out <= 8'((sum1 + 15'sd8) >>> 4);
+    end
+  end
+
 endmodule

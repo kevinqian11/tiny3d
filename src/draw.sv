@@ -1,4 +1,6 @@
 `default_nettype none
+
+// 3D Cube Top Module
 module tt_um_tiny3d_kevinqian11(
   input  wire [7:0] ui_in,    // Dedicated inputs
   output wire [7:0] uo_out,   // Dedicated outputs
@@ -11,7 +13,6 @@ module tt_um_tiny3d_kevinqian11(
 );
 
   // TinyTapeout I/O Mappings
-
   logic left, right, up, down, leftz, rightz;
   logic hsync, vsync;
   logic [1:0] r, g, b;
@@ -21,14 +22,14 @@ module tt_um_tiny3d_kevinqian11(
   assign down = ui_in[3];
   assign leftz = ui_in[4];
   assign rightz = ui_in[5];
-  assign uo_out[0] = hsync;
-  assign uo_out[1] = vsync;
-  assign uo_out[2] = r[1];
-  assign uo_out[3] = r[0];
-  assign uo_out[4] = g[1];
+  assign uo_out[0] = r[1];
+  assign uo_out[1] = g[1];
+  assign uo_out[2] = b[1];
+  assign uo_out[3] = vsync;
+  assign uo_out[4] = r[0];
   assign uo_out[5] = g[0];
-  assign uo_out[6] = b[1];
-  assign uo_out[7] = b[0];
+  assign uo_out[6] = b[0];
+  assign uo_out[7] = hsync;
   assign uio_out = 0;
   assign uio_oe  = 0;
 
@@ -38,7 +39,7 @@ module tt_um_tiny3d_kevinqian11(
   logic vblank;
   vga_timings timing(.*);
 
-  // display blanking intervals
+  // VGA blanking intervals
   logic [1:0] rbuf, gbuf, bbuf;
   always_comb begin
     r = (display) ? rbuf : 2'b00;
@@ -46,31 +47,33 @@ module tt_um_tiny3d_kevinqian11(
     b = (display) ? bbuf : 2'b00;
   end
 
-  // angle and shape button controls
-  logic [7:0] angleY;
-  logic [7:0] angleX;
-  logic [7:0] angleZ;
+  // User angle controls
+  logic [7:0] angleY, angleX, angleZ;
   controls XYZShape(.*);
 
-  // sequential vertex processing
+  // Sequential vertex processing
   logic [7:0][9:0] sx, sy;
   vertex map(.*);
 
-  // display match vertex
+  // VGA vertex display match
   logic [7:0] vertex_match; 
+  logic [9:0] current_sx, current_sy; // Temporary variables
   always_comb begin
     vertex_match = 8'b0;
     for(int i = 0; i < 8; i++) begin
-      vertex_match[i] = (col[9:1] == sx[i][9:1]) && (row[9:1] == sy[i][9:1]);
+      // 1. Grab the full 10-bit vector using the dynamic index
+      current_sx = sx[i];
+      current_sy = sy[i];
+            
+      // 2. Do the bit-slice comparison on the temporary vector
+      vertex_match[i] = (col[9:1] == current_sx[9:1]) && (row[9:1] == current_sy[9:1]);
     end
   end
 
-  // display color vertex
-  // Later Implement Further Z direction = Lower Shade if there's room
-  // Color each vertex a distinct color for emulation
+  // VGA pixel coloring
   two_face color_vertex(.*);
 
-  // unused wires
+  // Unused wires
   wire _unused = &{ena, ui_in[7:6], uio_in, row[0], col[0], 1'b0};
 
 endmodule: tt_um_tiny3d_kevinqian11
