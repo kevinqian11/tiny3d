@@ -19,8 +19,8 @@ module rotation_2d
       v_out <= '0;
     end
     else if(en) begin
-      u_out <= 8'((sum0 + 15'sd8) >>> 4);
-      v_out <= 8'((sum1 + 15'sd8) >>> 4);
+      u_out <= 8'((sum0 + 17'sd8) >>> 4);
+      v_out <= 8'((sum1 + 17'sd8) >>> 4);
     end
   end
 

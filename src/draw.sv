@@ -57,15 +57,13 @@ module tt_um_tiny3d_kevinqian11(
 
   // VGA vertex display match
   logic [7:0] vertex_match; 
-  logic [9:0] current_sx, current_sy; // Temporary variables
+  logic [9:0] current_sx, current_sy;
   always_comb begin
     vertex_match = 8'b0;
     for(int i = 0; i < 8; i++) begin
-      // 1. Grab the full 10-bit vector using the dynamic index
       current_sx = sx[i];
       current_sy = sy[i];
             
-      // 2. Do the bit-slice comparison on the temporary vector
       vertex_match[i] = (col[9:1] == current_sx[9:1]) && (row[9:1] == current_sy[9:1]);
     end
   end
@@ -74,6 +72,6 @@ module tt_um_tiny3d_kevinqian11(
   two_face color_vertex(.*);
 
   // Unused wires
-  wire _unused = &{ena, ui_in[7:6], uio_in, row[0], col[0], 1'b0};
+  wire _unused = &{ena, ui_in[7:6], uio_in, row[0], col[0], current_sx[0], current_sy[0], 1'b0};
 
 endmodule: tt_um_tiny3d_kevinqian11
