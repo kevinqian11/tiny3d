@@ -1,7 +1,7 @@
 ![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg) ![](../../workflows/test/badge.svg) ![](../../workflows/fpga/badge.svg)
 # Tiny3D - Aspiring 3D Graphics Engine
 
-This project implements a 3D graphics hardware pipeline to render a rotating cube to a VGA display with user control for the rotation of the cube around all axes.
+This project implements a 3D graphics hardware pipeline to render the vertices of a cube to a VGA display with user control for the rotation of the cube around all axes.
 
 ## Core Components
 

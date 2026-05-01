@@ -9,7 +9,7 @@ You can also include images in this folder and reference them in the markdown. E
 
 ## How it works
 
-This project implements a 3D graphics hardware pipeline to render a rotating cube to a VGA display with user control for the rotation of the cube around all axes.
+This project implements a 3D graphics hardware pipeline to render the vertices of a cube to a VGA display with user control for the rotation of the cube around all axes.
 
 ### Core Components
 
