@@ -1,6 +1,7 @@
+![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg) ![](../../workflows/test/badge.svg) ![](../../workflows/fpga/badge.svg)
 # Tiny3D - Aspiring 3D Graphics Engine
 
-This project implements a 3D graphics hardware pipeline to render a rotating cube to a VGA display, with user control for the rotation of the cube around all axes.
+This project implements a 3D graphics hardware pipeline to render a rotating cube to a VGA display with user control for the rotation of the cube around all axes.
 
 ## Core Components
 
@@ -12,8 +13,14 @@ This project implements a 3D graphics hardware pipeline to render a rotating cub
 
 ## How to test
 
-Once powered, the cube vertices will be rendered with its front face directly facing the screen. Rotate the cube by driving the input pins `ui_in[5:0]` to indicate a direction to move the front face. `rst_n` will reset the cube to its original position facing the screen.
+Once powered, the cube vertices will be rendered with its front face directly facing the screen. Rotate the cube by driving the input pins `ui_in[5:0]` high to indicate a direction to move the front face. This can be accomplished with buttons and pull-down resistors. `rst_n` will reset the cube to its original position facing the screen.
 
 ## External hardware
 
-[Tiny Tapeout VGA Pmod](https://store.tinytapeout.com/products/TinyVGA-Pmod-p678647356). Additionally, 6 buttons to control the directional inputs on ports 0-5.
+[Tiny Tapeout VGA Pmod](https://store.tinytapeout.com/products/TinyVGA-Pmod-p678647356). Additionally, 6 buttons with pull-down resistors to control the directional inputs on ports 0-5.
+
+## What is Tiny Tapeout?
+
+Tiny Tapeout is an educational project that aims to make it easier and cheaper than ever to get your digital and analog designs manufactured on a real chip.
+
+To learn more and get started, visit https://tinytapeout.com.
