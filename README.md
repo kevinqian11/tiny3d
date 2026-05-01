@@ -15,6 +15,24 @@ This project implements a 3D graphics hardware pipeline to render the vertices o
 
 Once powered, the cube vertices will be rendered with its front face directly facing the screen. Rotate the cube by driving the input pins `ui_in[5:0]` high to indicate a direction to move the front face. This can be accomplished with buttons and pull-down resistors. `rst_n` will reset the cube to its original position facing the screen.
 
+### Inputs
+  ui[0]: LEFT \
+  ui[1]: RIGHT \
+  ui[2]: UP \
+  ui[3]: DOWN \
+  ui[4]: LEFTZ (CCW) \
+  ui[5]: RIGHTZ (CW)
+
+### Outputs (VGA Pmod Pinout)
+  uo[0]: R1 \
+  uo[1]: G1 \
+  uo[2]: B1 \
+  uo[3]: vsync \
+  uo[4]: R0 \
+  uo[5]: G0 \
+  uo[6]: B0 \
+  uo[7]: hsync
+
 ## External hardware
 
 [Tiny Tapeout VGA Pmod](https://store.tinytapeout.com/products/TinyVGA-Pmod-p678647356). Additionally, 6 buttons with pull-down resistors to control the directional inputs on ports 0-5.
