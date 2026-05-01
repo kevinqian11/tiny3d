@@ -1,42 +1,19 @@
-![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg) ![](../../workflows/test/badge.svg) ![](../../workflows/fpga/badge.svg)
+# Tiny3D - Aspiring 3D Graphics Engine
 
-# Tiny Tapeout Verilog Project Template
+This project implements a 3D graphics hardware pipeline to render a rotating cube to a VGA display, with user control for the rotation of the cube around all axes.
 
-- [Read the documentation for project](docs/info.md)
+## Core Components
 
-## What is Tiny Tapeout?
+**Vertex Processing State Machine** - Static, resting 3D coordinates of each of the 8 vertices are routed sequentially through a single math engine during the vertical blanking period of the VGA display to calculate the final coordinate positions of the vertices given an input angle for the X, Y, and Z axis. These input angles are controlled by the user through button inputs, which control the rotation of the cube like a digital joystick.
 
-Tiny Tapeout is an educational project that aims to make it easier and cheaper than ever to get your digital and analog designs manufactured on a real chip.
+**Rotation Math** - A 3D rotation matrix is applied to each vertex for all three axes through a single optimized rotation engine. Coordinates are represented by 8 bits, and all math is performed as fixed-point. A hardwired 6-bit trigonometry lookup table fetches the respective sine and cosine fractional values as Q1.4 fixed-point numbers. Then, a collection of four 8x6 multipliers as well as an adder and subtracter apply the 3D rotation matrix to the vertex coordinates. The results of this arithmetic can be rearranged to give a rotation around either the X, Y, or Z axis.
 
-To learn more and get started, visit https://tinytapeout.com.
+**VGA Rasterization** - The vertices are displayed onto a VGA display through orthographic projection, which simply entails dropping the Z term when mapping to the 2D screen. Perspective projection would've been awesome here, but given the silicon area available, it was out of budget for this project.
 
-## Set up your Verilog project
+## How to test
 
-1. Add your Verilog files to the `src` folder.
-2. Edit the [info.yaml](info.yaml) and update information about your project, paying special attention to the `source_files` and `top_module` properties. If you are upgrading an existing Tiny Tapeout project, check out our [online info.yaml migration tool](https://tinytapeout.github.io/tt-yaml-upgrade-tool/).
-3. Edit [docs/info.md](docs/info.md) and add a description of your project.
-4. Adapt the testbench to your design. See [test/README.md](test/README.md) for more information.
+Once powered, the cube vertices will be rendered with its front face directly facing the screen. Rotate the cube by driving the input pins `ui_in[5:0]` to indicate a direction to move the front face. `rst_n` will reset the cube to its original position facing the screen.
 
-The GitHub action will automatically build the ASIC files using [LibreLane](https://www.zerotoasiccourse.com/terminology/librelane/).
+## External hardware
 
-## Enable GitHub actions to build the results page
-
-- [Enabling GitHub Pages](https://tinytapeout.com/faq/#my-github-action-is-failing-on-the-pages-part)
-
-## Resources
-
-- [FAQ](https://tinytapeout.com/faq/)
-- [Digital design lessons](https://tinytapeout.com/digital_design/)
-- [Learn how semiconductors work](https://tinytapeout.com/siliwiz/)
-- [Join the community](https://tinytapeout.com/discord)
-- [Build your design locally](https://www.tinytapeout.com/guides/local-hardening/)
-
-## What next?
-
-- [Submit your design to the next shuttle](https://app.tinytapeout.com/).
-- Edit [this README](README.md) and explain your design, how it works, and how to test it.
-- Share your project on your social network of choice:
-  - LinkedIn [#tinytapeout](https://www.linkedin.com/search/results/content/?keywords=%23tinytapeout) [@TinyTapeout](https://www.linkedin.com/company/100708654/)
-  - Mastodon [#tinytapeout](https://chaos.social/tags/tinytapeout) [@matthewvenn](https://chaos.social/@matthewvenn)
-  - X (formerly Twitter) [#tinytapeout](https://twitter.com/hashtag/tinytapeout) [@tinytapeout](https://twitter.com/tinytapeout)
-  - Bluesky [@tinytapeout.com](https://bsky.app/profile/tinytapeout.com)
+[Tiny Tapeout VGA Pmod](https://store.tinytapeout.com/products/TinyVGA-Pmod-p678647356). Additionally, 6 buttons to control the directional inputs on ports 0-5.
